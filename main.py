@@ -14,13 +14,11 @@ last_message_time = None
 
 
 def MemePromt(message):
-    if randint(0,1) // 1 == 0:
+    if randint(0,1) == 0:
         answer = chatbot.ask(firstMemePromt.format(message))
-        chatbot.reset()
         return answer
     else:
         answer = chatbot.ask(secondMemePromt.format(message))
-        chatbot.reset()
         return answer
 
 
@@ -31,6 +29,11 @@ def Promt(message):
         bot.reply_to(message, chatbot.ask(message_text))
     else:
         bot.reply_to(message, chatbot.ask("Кто ты?"))
+        
+
+@bot.message_handler(commands=['reset'])
+def Reset(message):
+    chatbot.reset()
 
 
 # @bot.message_handler(commands=['settings'])
@@ -74,6 +77,7 @@ def MemeReply(message):
             last_message_time = datetime.datetime.now()
         elif message.text.startswith('$'):
             bot.reply_to(message, MemePromt(message.text))
+            
 
 print("STARTED")            
 bot.infinity_polling()
