@@ -47,9 +47,9 @@ def Reset(message):
 
 @bot.message_handler(commands=['settings'])
 def NumOfPromt(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    button1 = types.KeyboardButton("Рандом промт")
-    button2 = types.KeyboardButton("Промт ручного вызова")
+    markup = types.InlineKeyboardMarkup()
+    button1 = types.InlineKeyboardButton("Рандом промт", callback_data="random")
+    button2 = types.InlineKeyboardButton("Промт ручного вызова", callback_data="manual")
     markup.add(button1, button2)
 
     bot.send_message(message.chat.id, f'*Текущий рандом-промт:*\n\
@@ -60,9 +60,12 @@ def NumOfPromt(message):
 @bot.callback_query_handler(func=lambda call: True)
 def SettingButtonPressed(call):
     print("1")
-    if call.data == "Рандом промт":
+    if call.data == "random":
         print("2")
         bot.send_message(call.message.chat.id, "1")
+    elif call.data == "manual":
+        bot.send_message(call.message.chat.id, "2")
+
     
 
 @bot.message_handler(commands=['currentPromts'])
