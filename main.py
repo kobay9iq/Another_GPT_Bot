@@ -46,25 +46,33 @@ def Reset(message):
 
 
 @bot.message_handler(commands=['settings'])
-def NumOfPromt(message):
+def PromtsSettings(message):
     markup = types.InlineKeyboardMarkup()
-    button1 = types.InlineKeyboardButton("Рандом промт", callback_data="random")
-    button2 = types.InlineKeyboardButton("Промт ручного вызова", callback_data="manual")
+    button1 = types.InlineKeyboardButton("Рандом промт", callback_data="1")
+    button2 = types.InlineKeyboardButton("Промт ручного вызова", callback_data="2")
     markup.add(button1, button2)
 
-    bot.send_message(message.chat.id, f'*Текущий рандом-промт:*\n\
-{randomMemePromt}.\n*Текущий промт ручного вызова:*\n\
-{manualMemePromt}.', parse_mode="Markdown", reply_markup=markup)
+    bot.send_message(message.chat.id, f'Какой промт вы хотите поменять?\n\
+*Текущий рандом-промт:*\n\
+{randomMemePromt}.\n*Текущий промт ручного вызова:*\n{manualMemePromt}.',
+                    parse_mode = "Markdown", reply_markup = markup)
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def SettingButtonPressed(call):
-    print("1")
-    if call.data == "random":
-        print("2")
-        bot.send_message(call.message.chat.id, "1")
-    elif call.data == "manual":
-        bot.send_message(call.message.chat.id, "2")
+    bot_msg = bot.reply_to(call.message, f"""Ответьте на мое сообщение новым промтом,
+вставьте {{}} туда, *где должно находится сообщение от пользователя* \n 
+*Пример:*\n{defaultManualMemePromt}""", parse_mode = "Markdown")
+    
+    bot.register_for_reply_by_message_id(bot_msg.id, ChangingPromts)
+
+
+
+def ChangingPromts(message, call):
+    if call.data == "1":
+        print("1")
+    elif call.data == "2":
+        print("1")
 
     
 
