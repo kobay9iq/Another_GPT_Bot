@@ -76,7 +76,7 @@ def MemePromt(message, manual):
         return answer
 
 
-@bot.message_handler(commands=['help'])
+@bot.message_handler(commands=['gpt'])
 def Help(message):
     bot.send_message(message.chat.id, helpText,
                      parse_mode = "Markdown")
