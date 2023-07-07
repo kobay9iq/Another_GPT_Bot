@@ -37,6 +37,35 @@ randomMemePromt = defaultRandomMemePromt
 
 
 def MemePromtHandler(message):
+    if len(message.text) >= 5 and not (message.text.startswith('/')):
+        if picturesEnabled:
+            SendMessageWithPicture(message, manual = False)
+        else:
+            bot.reply_to(message, MemePromt(message.text, manual=False))
+    
+    elif message.text.startswith('$'):
+        if picturesEnabled:
+                SendMessageWithPicture(message, manual = True)
+        else:
+            bot.reply_to(message, MemePromt(message.text, manual=True))
+    
+    elif message.reply_to_message and message.text.startswith('!гпт'):
+        second_person_message = message.reply_to_message
+        if picturesEnabled:
+            SendMessageWithPicture(message, manual = True)
+        else:
+            bot.reply_to(second_person_message, 
+                     MemePromt(second_person_message.text, manual=True))
+            
+
+def SendMessageWithPicture(message, manual):
+    picture = open(Picture(), "rb")
+    if picture is None: return
+    
+    bot.send_photo(message.chat.id, picture, 
+                   caption = MemePromt(message.text, manual = manual),
+                   reply_to_message_id = message.id)
+    
 
 def MemePromt(message, manual):
     if manual:
@@ -131,19 +160,10 @@ def BackPromtsToDefault(message):
 @bot.message_handler(content_types=['text'])
 def MemeReply(message):
     global lastMessageTime
-    if len(message.text) >= 5 and not (message.text.startswith('/')):
-        if (lastMessageTime is None or (datetime.datetime.now() >
-            lastMessageTime + datetime.timedelta(seconds=botCoolDownInSec))):
-                bot.reply_to(message, MemePromt(message.text, manual=False))
-                lastMessageTime = datetime.datetime.now()
-    
-    elif message.text.startswith('$'):
-        bot.reply_to(message, MemePromt(message.text, manual=True))
-    
-    elif message.reply_to_message and message.text.startswith('!гпт'):
-        second_person_message = message.reply_to_message
-        bot.reply_to(second_person_message, 
-                     MemePromt(second_person_message.text, manual=True))
+    if (lastMessageTime is None or (datetime.datetime.now() >
+        lastMessageTime + datetime.timedelta(seconds=botCoolDownInSec))):
+            MemePromtHandler(message)
+            lastMessageTime = datetime.datetime.now()
 
 
 print("STARTED")
