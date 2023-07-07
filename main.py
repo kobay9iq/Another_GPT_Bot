@@ -1,9 +1,7 @@
 from revChatGPT.V3 import Chatbot
-import telebot
+from pictures import Picture
 from telebot import types
-import configparser
-import datetime
-
+import telebot, configparser, datetime
 
 config = configparser.ConfigParser()
 config.read("config.ini", encoding="utf-8")
@@ -11,7 +9,7 @@ config.read("config.ini", encoding="utf-8")
 bot = telebot.TeleBot(token = config["BOT API Key"]["bot_key"])
 chatbot = Chatbot(api_key = config["OpenAI API Key"]["gpt_key"])
 
-help_text = "/promt - запрос к ChatGPT без всяких оксимиронов \
+helpText = "/promt - запрос к ChatGPT без всяких оксимиронов \
 и прочих приколов.\
 \n/reset - сброс промтов к значениям по умолчанию.\
 \n/settings - установка новых промтов.\
@@ -29,11 +27,16 @@ defaultManualMemePromt = "Ответь на сообщение {} в стиле 
 defaultRandomMemePromt = "Ответь на сообщение {} строчкой из песни оксимирона,\
 не забудь уточнить, что это сказал оксимирон, и название песни"
 
-last_message_time = None
+picturesEnabled = True
+
+lastMessageTime = None
+botCoolDownInSec = 300
 
 manualMemePromt = defaultManualMemePromt
 randomMemePromt = defaultRandomMemePromt
 
+
+def MemePromtHandler(message):
 
 def MemePromt(message, manual):
     if manual:
@@ -46,7 +49,7 @@ def MemePromt(message, manual):
 
 @bot.message_handler(commands=['help'])
 def Help(message):
-    bot.send_message(message.chat.id, help_text,
+    bot.send_message(message.chat.id, helpText,
                      parse_mode = "Markdown")
     
 
@@ -127,12 +130,12 @@ def BackPromtsToDefault(message):
 
 @bot.message_handler(content_types=['text'])
 def MemeReply(message):
-    global last_message_time
+    global lastMessageTime
     if len(message.text) >= 5 and not (message.text.startswith('/')):
-        if (last_message_time is None or (datetime.datetime.now() >
-            last_message_time + datetime.timedelta(seconds=300))):
+        if (lastMessageTime is None or (datetime.datetime.now() >
+            lastMessageTime + datetime.timedelta(seconds=botCoolDownInSec))):
                 bot.reply_to(message, MemePromt(message.text, manual=False))
-                last_message_time = datetime.datetime.now()
+                lastMessageTime = datetime.datetime.now()
     
     elif message.text.startswith('$'):
         bot.reply_to(message, MemePromt(message.text, manual=True))
