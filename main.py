@@ -36,8 +36,8 @@ manualMemePromt = defaultManualMemePromt
 randomMemePromt = defaultRandomMemePromt
 
 
-def MemePromtHandler(message):
-    if len(message.text) >= 5 and not (message.text.startswith('/')):
+def MemePromtHandler(message, random):
+    if len(message.text) >= 5 and not (message.text.startswith('/')) and random:
         if picturesEnabled:
             SendMessageWithPicture(message, manual = False)
         else:
@@ -162,8 +162,10 @@ def MemeReply(message):
     global lastMessageTime
     if (lastMessageTime is None or (datetime.datetime.now() >
         lastMessageTime + datetime.timedelta(seconds=botCoolDownInSec))):
-            MemePromtHandler(message)
+            MemePromtHandler(message, random=True)
             lastMessageTime = datetime.datetime.now()
+    else: 
+        MemePromtHandler(message, random=False)
 
 
 print("STARTED")
